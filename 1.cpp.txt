@@ -24,8 +24,6 @@ struct Car {
 	string status;
 	string timevorod;
 	string timeexite;
-	/*MyTime timevorod;
-	MyTime timeexit;*/
 	int cost;
 	int countentry;
 
