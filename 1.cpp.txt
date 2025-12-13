@@ -1,0 +1,1275 @@
+stream>
+#include<Windows.h>
+#include<fstream>
+#include<sstream>
+#include<string>
+#include<ctime>
+#include<chrono>
+#include<iomanip>
+
+using namespace std;
+
+
+struct MyTime {
+	int year;
+	int month;
+	int day;
+	int hour;
+	int min;
+	int sec;
+};
+
+struct Car {
+	string pelak;
+	string status;
+	string timevorod;
+	string timeexite;
+	/*MyTime timevorod;
+	MyTime timeexit;*/
+	int cost;
+	int countentry;
+
+};
+
+
+
+struct Confing {
+	int capacity;
+	int cost1;
+	int cost2;
+	int cost3;
+};
+
+enum ConsolColor {
+	BLACK = 0,
+	BLUE = 1,
+	GREEN = 2,
+	CYAN = 3,
+	RED = 4,
+	MAGENTA = 5,
+	BROWN = 6,
+	LIGHTGRAY = 7,
+	DARKGRAY = 8,
+	LIGHTBLUE = 9,
+	LIGHTGREEN = 10,
+	LIGHTCYAN = 11,
+	LIGHTRED = 12,
+	LIGHTMAGENTA = 13,
+	YELLOW = 14,
+	WHITE = 15
+};
+
+void printColored(string message, int textColor, int bgColor = 0, bool newline = false);
+double inputdouble();
+
+bool checkpelak(string pelak1);
+
+bool inparking(string pelak1, Car c);
+
+void ReadData(Car A[], int& count);
+
+void WriteData(Car A[], int& count);
+
+void entry(Car A[], int& count, string pelak1);
+
+bool serchforexit(Car A[], string pelak1, Car& car);
+
+void exite(Car A[], int& count, string pelak1);
+
+void situation(Car A[], int& count, Confing& cg);
+
+void serchcar(string pelak1, Car A[], int& count);
+
+void listcar(Car A[], int& count);
+
+string gettime();
+
+int stringtoint(string time);
+
+void readconfing(Confing& cg);
+
+void writeconfing(Confing& cg);
+
+void setting();
+
+void reporting();
+
+void reportingdaily(int year, int month, int day);
+
+void reportingweekly(int year, int month, int day);
+
+void reportingmonthly(int year, int month);
+
+void hightrafic(string pelak);
+
+
+
+
+int main() {
+	Car c;
+	Confing cg;
+	string pelak1;
+	string date;
+	Car A[30];
+	int count = 0;
+	int choice;
+
+
+	printColored(" *Hi my dear friend!*", YELLOW);
+	cout << endl;
+	printColored("I will show you a menu, so you can choice if you want.", YELLOW);
+	cout << endl;
+
+
+	cout << endl;
+	system("pause");
+
+	while (true) {
+		system("cls");
+
+		printColored("Menu for choice:", GREEN);
+		cout << endl;
+		printColored("_______________________________", GREEN);
+		cout << endl;
+		printColored("1 | log in: ", YELLOW);
+		cout << endl;
+		printColored("2 | log out :", YELLOW);
+		cout << endl;
+		printColored("3 | parking situation:", YELLOW);
+		cout << endl;
+		printColored("4 | serch car:", YELLOW);
+		cout << endl;
+		printColored("5 | list of parking car :", YELLOW);
+		cout << endl;
+		printColored("6 | reporting:", YELLOW);
+		cout << endl;
+		printColored("7 | setting:", YELLOW);
+		cout << endl;
+		printColored("8 | exit :", YELLOW);
+		cout << endl;
+		printColored("_________________________________", GREEN);
+		cout << endl;
+
+		do {
+			printColored("which option do you want to choice?(1 to 8)", GREEN);
+			cout << endl;
+			choice = inputdouble();
+			if (choice < 1 || choice>8) {
+				printColored("invalid input", RED);
+				cout << endl;
+
+			}
+
+		} while (choice < 1 || choice > 8);
+
+		system("cls");
+
+		switch (choice) {
+
+		case 1:
+
+			entry(A, count, pelak1);
+			break;
+
+		case 2:
+
+			exite(A, count, pelak1);
+			break;
+
+		case 3:
+
+			situation(A, count, cg);
+			break;
+
+
+		case 4:
+
+			serchcar(pelak1, A, count);
+			break;
+
+		case 5:
+
+			listcar(A, count);
+			break;
+
+		case 6:
+			reporting();
+			break;
+
+		case 7:
+
+			setting();
+			break;
+
+		case 8:
+			printColored(" ^^ you have successfuly exited^^", GREEN);
+			cout << endl;
+			exit(0);
+
+
+		default:
+
+			printColored("no valide", RED);
+			cout << endl;
+		}
+		cout << endl;
+		system("pause");
+	}
+
+}
+
+
+double inputdouble() {
+	string inputline;
+	double number;
+	while (true) {
+		getline(cin, inputline);
+		stringstream ss(inputline);
+		if (ss >> number) {
+			if (ss.peek() == EOF) {
+				return number;
+			}
+		}
+	}
+}
+
+void printColored(string message, int textColor, int bgColor, bool newline) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	int colorCode = bgColor * 16 + textColor;
+	SetConsoleTextAttribute(hConsole, colorCode);
+
+	cout << message;
+
+	if (newline) cout << endl;
+
+	SetConsoleTextAttribute(hConsole, 7);
+}
+
+
+bool checkpelak(string pelak1)
+{
+	if (pelak1.size() != 6)
+	{
+		return false;
+	}
+	else
+	{
+		if ((pelak1[0] >= '0' || pelak1[0] <= '9') && (pelak1[1] >= '0' || pelak1[1] <= '9') && (pelak1[2] >= 'a' || pelak1[2] <= 'z') &&
+			(pelak1[3] >= '0' || pelak1[3] <= '9') && (pelak1[4] >= '0' || pelak1[4] <= '9') && (pelak1[5] >= '0' || pelak1[5] <= '9'))
+		{
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
+	}
+}
+
+bool inparking(string pelak1, Car c) {
+	/*if (!checkpelak(pelak1))
+		return true;*/
+
+	bool found = false;
+	string updatestatus;
+	ifstream file1("log.txt");
+	if (!file1)
+	{
+		cout << "can not open file1!(inparking)" << endl;
+		exit(-1);
+	}
+	string line;
+	string cost;
+	while (getline(file1 >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost, ';');
+		c.cost = stoi(cost);
+
+		if (c.pelak == pelak1)
+		{
+			found = true;
+			updatestatus = c.status;
+		}
+	}
+	if (!found) {
+		return false;
+	}
+	if (updatestatus == "outside") {
+
+		printColored("car can enter the parking", GREEN);
+		cout << endl;
+		return false;
+	}
+	if (updatestatus == "inside") {
+		printColored("car can not enter the parking becouse car already inside", RED);
+		cout << endl;
+		return true;
+	}
+}
+
+
+void ReadData(Car A[], int& count) {
+
+	Car c;
+	count = 0;
+	ifstream file1("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\log.txt");
+	if (!file1) {
+		cout << "can not open file1(readata)!" << endl;
+		exit(-1);
+	}
+
+	string line;
+	string cost;
+	while (getline(file1 >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost);
+		c.cost = stoi(cost);
+		A[count] = c;
+		count++;
+	}
+	file1.close();
+
+}
+
+void WriteData(Car A[], int& count) {
+
+	ofstream file1("C:\\Users\\Big\\source\\repos\\proje(1)\\proje(1)\\log.txt");
+	if (!file1) {
+		cout << "can not open file1(writdata)!" << endl;
+		exit(-1);
+	}
+	for (int i = 0; i < count; i++) {
+		if (A[i].status == "outside")
+		{
+
+			file1 << A[i].pelak << ";" << A[i].timevorod << ";" << A[i].timeexite << ";" << A[i].status << ";" << A[i].cost << endl;
+		}
+
+		else if (A[i].status == "inside")
+		{
+			file1 << A[i].pelak << ";" << A[i].timevorod << ";" << "-" << ";" << A[i].status << ";" << 0 << endl;
+		}
+	}
+	file1.close();
+}
+
+void entry(Car A[], int& count, string pelak1) {
+	Car c;
+	Confing cg;
+	c.status = "inside";
+	ReadData(A, count);
+	readconfing(cg);
+	system("cls");
+
+	printColored("input pelak for log in=", BROWN);
+	cout << endl;
+	getline(cin, pelak1);
+
+	while (!checkpelak(pelak1)) {
+
+		string answer;
+		printColored("format pelak is not true!", LIGHTRED);
+		cout << endl;
+		printColored("do you want to continue?(y_yes/n_no)", BROWN);
+		cout << endl;
+		cin >> answer;
+		if (answer == "n" || answer == "no") {
+			return;
+		}
+		else
+		{
+			printColored("pleas input a pelak again:", BROWN);
+			cout << endl;
+			cin >> pelak1;
+
+		}
+	}
+
+	while (inparking(pelak1, c))
+	{
+		string answer;
+		printColored("do you want to continue to input another pelak ?(y_yes/n_no)", BROWN);
+		cout << endl;
+		cin >> answer;
+		if (answer == "n" || answer == "no") {
+			return;
+		}
+		else
+		{
+			printColored("pleas input a pelak again.", BROWN);
+			cout << endl;
+			cin >> pelak1;
+		}
+
+	}
+
+
+	if (count >= cg.capacity) {
+		printColored("the capacity is full !!!  but you can use the parking", RED);
+		cout << endl;
+	}
+	else {
+		printColored("the parking lot is still empty", GREEN);
+		cout << endl;
+	}
+
+
+	c.timevorod = gettime();
+	printColored("entry time=", LIGHTBLUE);
+	cout << c.timevorod << endl;
+
+
+
+	ofstream file1("C:\\Users\\Big\\source\\repos\\proje(1)\\proje(1)\\log.txt", ios::app);
+	if (!file1) {
+		cout << "can not open file1(writdata)!" << endl;
+		exit(-1);
+	}
+	file1 << pelak1 << ";" << c.timevorod << ";" << "-" << ";" << c.status << ";" << 0 << endl;
+	file1.close();
+
+	printColored("seccessfully entered ^^", GREEN);
+	cout << endl;
+	printColored("car with this pelak-> ", LIGHTBLUE);
+	cout << pelak1;
+	printColored(" in time ", LIGHTBLUE);
+	cout << c.timevorod;
+	printColored(" entered the parking. ", LIGHTBLUE);
+	cout << endl;
+
+}
+
+bool serchforexit(Car A[], string pelak1, Car& car) {
+	/*if (!checkpelak(car.pelak))
+		return false;*/
+	Car c;
+	bool found = false;
+	string updatestatus;
+	string updatetimevorod;
+	ifstream file1("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\log.txt");
+	if (!file1) {
+		cout << "can not open file1(readata)!" << endl;
+		exit(-1);
+	}
+	string line;
+	string cost;
+	while (getline(file1 >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost, ';');
+		if (pelak1 == c.pelak) {
+			found = true;
+			updatestatus = c.status;
+			updatetimevorod = c.timevorod;
+		}
+	}
+
+	if (!found) {
+		printColored("pelak1 was not found!!", RED);
+		cout << endl;
+		return false;
+	}
+
+	if (updatestatus == "inside")
+	{
+		printColored("car in the parking and can exit the parking.", GREEN);
+		cout << endl;
+		car.timevorod = updatetimevorod;
+		return true;
+	}
+	if (updatestatus == "outside")
+	{
+		printColored(" Pelak1 for exite  was not in the parking=outside", RED);
+		cout << endl;
+		return false;
+	}
+
+
+	file1.close();
+
+}
+
+void exite(Car A[], int& count, string pelak1) {
+
+	Confing cg;
+	Car car;
+	ReadData(A, count);
+
+	printColored("input pelak1 for exit=", BROWN);
+	cout << endl;
+	getline(cin, pelak1);
+
+	while (!checkpelak(pelak1)) {
+
+		string answer;
+		printColored("format pelak is not true!", RED);
+		cout << endl;
+		printColored("do you want to continue?(y_yes/n_no)", BROWN);
+		cout << endl;
+		cin >> answer;
+		if (answer == "n" || answer == "no") {
+			return;
+		}
+		else
+		{
+			printColored("pleas input a pelak again.", BROWN);
+			cout << endl;
+			cin >> pelak1;
+
+		}
+	}
+	while (!serchforexit(A, pelak1, car))
+	{
+		string answer;
+		printColored("do you want to continue ? (y_yes / n_no)", BROWN);
+		cout << endl;
+		cin >> answer;
+		if (answer == "n" || answer == "no")
+		{
+			return;
+		}
+		else if (answer == "y" || answer == "yes") {
+			printColored("pleas input a pelak again:", BROWN);
+			cout << endl;
+			cin >> car.pelak;
+		}
+	}
+	//	readconfing();
+	car.pelak = pelak1;
+	car.timeexite = gettime();
+	printColored("exite time=", LIGHTBLUE);
+	cout << car.timeexite << endl;
+
+	ifstream file2("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\confing.txt");
+	if (!file2)
+	{
+		cout << "can not open file2!(in cost)" << endl;
+		exit(-1);
+	}
+
+	file2 >> cg.capacity;
+
+	file2 >> cg.cost1;
+
+	file2 >> cg.cost2;
+
+	file2 >> cg.cost3;
+
+
+	file2.close();
+
+	int x = stringtoint(car.timevorod);
+	int y = stringtoint(car.timeexite);
+	int difference = y - x;
+
+
+
+	if (difference >= 0 && difference < 30)
+	{
+		car.cost = cg.cost1;
+	}
+	else if (difference >= 30 && difference <= 60) {
+		car.cost = cg.cost2;
+	}
+	else
+	{
+		car.cost = cg.cost3;
+	}
+	//از اخر فایل چگ میکنه ک اخرین وضعیت را بده
+	for (int i = count; i >= 0; i--)
+	{
+		if (A[i].pelak == car.pelak && A[i].status == "inside")
+		{
+			A[i].pelak = car.pelak;
+			A[i].timevorod = car.timevorod;
+			A[i].timeexite = car.timeexite;
+			A[i].status = "outside";
+			A[i].cost = car.cost;
+			break;
+		}
+	}
+
+
+	WriteData(A, count);
+
+	printColored("car with this pelak", LIGHTBLUE);
+	cout << car.pelak;
+	printColored(" stopped for", LIGHTBLUE);
+	cout << difference,
+		printColored(" min ,with cost", LIGHTBLUE);
+	cout << car.cost;
+	printColored("toman,left the parking", LIGHTBLUE);
+	cout << endl;
+
+
+}
+
+void situation(Car A[], int& count, Confing& cg) {
+	readconfing(cg);
+	int countervorod = 0;
+	int counterexite = 0;
+	ReadData(A, count);
+
+	for (int i = 0; i < count; i++) {
+		if (A[i].status == "inside") {
+			countervorod++;
+		}
+	}
+	for (int i = 0; i < count; i++) {
+		if (A[i].status == "outside") {
+			counterexite++;
+		}
+	}
+	int vacancy = cg.capacity - countervorod;
+
+	printColored("situation:", LIGHTGRAY);
+	cout << endl;
+	cout << "-------------------------------------" << endl;
+	printColored("capacity:", LIGHTGRAY);
+	cout << cg.capacity << endl;
+	printColored("number of cars in the parking:", LIGHTGRAY);
+	cout << countervorod << endl;
+	printColored("number of cars that left the parking:", LIGHTGRAY);
+	cout << counterexite << endl;
+	printColored("vacancy(baghi mandeh):", LIGHTGRAY);
+	cout << vacancy << endl;
+
+}
+
+void serchcar(string pelak1, Car A[], int& count) {
+
+	printColored("input pelak for find car:", BROWN);
+	cout << endl;
+	getline(cin, pelak1);
+
+
+	string answer;
+	ReadData(A, count);
+
+
+	while (!checkpelak(pelak1)) {
+		string answer;
+		printColored("format pelak is not true!", RED);
+		cout << endl;
+		printColored("do you want to continue?(y_yes/n_no)", BROWN);
+		cout << endl;
+		cin >> answer;
+		if (answer == "n" || answer == "no") {
+			return;
+		}
+		else
+		{
+			printColored("pleas input a pelak again.", BROWN);
+			cout << endl;
+			/*getline(cin, c.pelak);*/
+			cin >> pelak1;
+		}
+
+	}
+
+	bool found = false;
+	int counter = 0;
+	for (int i = 0; i < count; i++)
+	{
+		if (A[i].pelak == pelak1 && A[i].status == "inside")
+		{
+			found = true;
+			printColored("car with this pelak ", LIGHTBLUE);
+			cout << A[i].pelak;
+			printColored(" and with this timevorod ", LIGHTBLUE);
+			cout << A[i].timevorod;
+			printColored(" founded.", LIGHTBLUE);
+			cout << endl;
+			break;
+		}
+		else if (A[i].pelak == pelak1 && A[i].status == "outside")
+		{
+			counter++;
+			printColored("the car has left the parking", LIGHTBLUE);
+			cout << counter;
+			printColored("bar", LIGHTBLUE);
+			cout << endl;
+		}
+	}
+
+	if (!found) {
+		printColored("not found.do you want to enter another pelak to serch ? (y_yes / n_no)", RED);
+		cout << endl;
+		cin >> answer;
+		if (answer == "no" || answer == "n")
+		{
+			return;
+		}
+		else
+		{
+			printColored("pleas input a pelakserch again.", BROWN);
+			cout << endl;
+			getline(cin, pelak1);
+		}
+
+	}
+
+}
+
+void listcar(Car A[], int& count) {
+
+	int counterlistvorod = 0;
+	int counterlistexite = 0;
+
+	ReadData(A, count);
+
+	cout << "list of cars in the parking:" << endl;
+	cout << endl;
+	for (int i = 0; i < count; i++) {
+
+		if (A[i].status == "inside")
+		{
+			counterlistvorod++;
+			printColored("car with this pelak ", LIGHTBLUE);
+			cout << A[i].pelak;
+			printColored(" in timevorod ", LIGHTBLUE);
+			cout << A[i].timevorod;
+			printColored(" entered the parking ", LIGHTBLUE);
+			cout << counterlistvorod;
+			printColored(" time", LIGHTBLUE);
+			cout << endl;
+
+		}
+		else if (A[i].status == "outside") {
+			counterlistexite++;
+			printColored("car with this pelak ", LIGHTBLUE);
+			cout << A[i].pelak;
+			printColored(" in timeexite ", LIGHTBLUE);
+			cout << A[i].timeexite;
+			printColored(" exited the parking ", LIGHTBLUE);
+			cout << counterlistexite;
+			printColored(" time ,with cost", LIGHTBLUE);
+			cout << A[i].cost << endl;
+		}
+	}
+
+}
+
+void readconfing(Confing& cg)
+{
+
+	ifstream file2("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\confing.txt");
+	if (!file2)
+	{
+		cout << "can not open file2!(in cost)" << endl;
+		exit(-1);
+	}
+
+	file2 >> cg.capacity;
+	file2 >> cg.cost1;
+	file2 >> cg.cost2;
+	file2 >> cg.cost3;
+
+
+	file2.close();
+	printColored("capacity=", LIGHTGRAY);
+	cout << cg.capacity << endl;
+	printColored("cost1=", LIGHTGRAY);
+	cout << cg.cost1 << endl;
+	printColored("cost2=", LIGHTGRAY);
+	cout << cg.cost2 << endl;
+	printColored("cost3=", LIGHTGRAY);
+	cout << cg.cost3 << endl;
+}
+
+void writeconfing(Confing& cg) {
+
+	ofstream file2("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\confing.txt");
+	if (!file2) {
+		cout << "can not open file2(write)!" << endl;
+		exit(-1);
+	}
+	file2 << cg.capacity << endl;
+	file2 << cg.cost1 << endl;
+	file2 << cg.cost2 << endl;
+	file2 << cg.cost3 << endl;
+
+}
+
+void setting()
+{
+	Confing cg;
+	readconfing(cg);
+
+	string answer;
+	printColored("do you want change capacity,cost1,cost2,cost3? (y/n)", BROWN);
+	cout << endl;
+	cin >> answer;
+
+	int newcapacity, newcost1, newcost2, newcost3;
+	if (answer == "y" || answer == "yes")
+	{
+		system("cls");
+		int option;
+		/*while(true)
+		  { */
+		printColored("meno for you to change if you want:", LIGHTGRAY);
+		cout << endl;
+		cout << "-------------------------------------" << endl;
+		printColored("1_newcapacity", LIGHTGRAY);
+		cout << endl;
+		printColored("2_newcost1", LIGHTGRAY);
+		cout << endl;
+		printColored("3_newcost2", LIGHTGRAY);
+		cout << endl;
+		printColored("4_newcost3", LIGHTGRAY);
+		cout << endl;
+		printColored("5_exit from changing", LIGHTGRAY);
+		cout << endl;
+		cout << "---------------------------------------" << endl;
+
+		do {
+			printColored("what optioon do yu want to choice?", BROWN);
+			cout << endl;
+
+			option = inputdouble();
+		} while (option < 1 && option>5);
+
+		switch (option) {
+
+		case 1:
+			printColored("newcapacity:", LIGHTGRAY);
+			cout << endl;
+			cin >> newcapacity;
+			cg.capacity = newcapacity;
+			break;
+
+		case 2:
+			printColored("newcost1:", LIGHTGRAY);
+			cout << endl;
+			cin >> newcost1;
+			cg.cost1 = newcost1;
+
+			break;
+
+		case 3:
+			printColored("newcost2:", LIGHTGRAY);
+			cout << endl;
+			cin >> newcost2;
+			cg.cost2 = newcost2;
+			break;
+
+		case 4:
+			printColored("newcost3:", LIGHTGRAY);
+			cout << endl;
+			cin >> newcost3;
+			cg.cost3 = newcost3;
+			break;
+
+		case 5:
+			printColored("exit!", RED);
+			cout << endl;
+			break;
+
+		default:
+			printColored("not valid!", RED);
+			cout << endl;
+		}
+		system("cls");
+		printColored("the chang was seccessful!! ^^", GREEN);
+		cout << endl;
+	}
+
+
+	else
+	{
+		printColored(" without changing.", LIGHTGREEN);
+		cout << endl;
+	}
+
+	writeconfing(cg);
+}
+
+string gettime() {
+	auto now = std::chrono::system_clock::now();
+	time_t timeNow = chrono::system_clock::to_time_t(now);
+	tm localTime;
+	localtime_s(&localTime, &timeNow);
+
+	ostringstream oss;
+	oss << put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+	return oss.str();
+}
+
+int stringtoint(string time) {
+	MyTime mt;
+
+	string year, month, day, hour, min, sec;
+	stringstream ss(time);
+	getline(ss >> ws, year, '-');
+	mt.year = stoi(year);
+	getline(ss >> ws, month, '-');
+	mt.month = stoi(month);
+	getline(ss >> ws, day, ' ');
+	mt.day = stoi(day);
+	getline(ss >> ws, hour, ':');
+	mt.hour = stoi(hour);
+	getline(ss >> ws, min, ':');
+	mt.min = stoi(min);
+	getline(ss >> ws, sec, ':');
+	mt.sec = stoi(sec);
+
+	int minuet = (mt.year * 365 * 24 * 60) + (mt.month * 30 * 24 * 60) + (mt.day * 24 * 60) + (mt.hour * 60) + (mt.min);
+	return minuet;
+}
+
+//void reportingdaily(Car c,string dateday) {
+//	int vorod= 0;
+//	int  khoroj= 0;
+//	ifstream file1("log.txt");
+//	if (!file1) {
+//		cout << "can not open file1." << endl;
+//		exit(-1);
+//	}
+//	while (file1 >> c.pelak >> c.timevorod >> c.timeexite >> c.status) {
+//		string datevorod = c.timevorod.substr(7, 10);
+//		string dateexite = c.timeexite.substr(24, 10);
+//		if (datevorod == dateday)
+//		{ 
+//			if( c.status=="inside")
+//			vorod++;
+//		}
+//		else if (dateexite == dateday) {
+//			if (c.status == "outside")
+//				khoroj++;
+//		}
+//	}
+//
+//	cout << "the date that you entred:" << dateday << endl;
+//
+// }
+
+
+void reporting()
+{
+	Car car;
+	int year, month, day;
+
+	printColored("reporting :", YELLOW);
+	cout << endl;
+	cout << "----------------------------------" << endl;
+	printColored("1_reporting daily:", YELLOW);
+	cout << endl;
+	printColored("2_reportingweekly:", YELLOW);
+	cout << endl;;
+	printColored("3_reportingmonthly:", YELLOW);
+	cout << endl;
+	printColored("4_high trafic cars:", YELLOW);
+	cout << endl;
+	cout << "------------------------------------" << endl;
+
+	char choice;
+
+	do {
+		printColored("what is your choice?", BROWN);
+		cout << endl;
+		choice = inputdouble();
+
+		if (choice < 1 || choice>8)
+			printColored("invalid input", RED);
+		cout << endl;
+
+	} while (choice < 1 && choice > 4);
+
+	if (choice == 1 || choice == 2 || choice == 3) {
+		cout << "input year:" << endl;
+		cin >> year;
+		cout << "input month:" << endl;
+		cin >> month;
+		cout << "input day:" << endl;
+		cin >> day;
+	}
+	system("cls");
+
+	switch (choice) {
+
+	case 1: {
+		reportingdaily(year, month, day);
+
+		break;
+	}
+	case 2: {
+		reportingweekly(year, month, day);
+		break;
+	}
+	case 3: {
+		reportingmonthly(year, month);
+		break;
+	}
+	case 4: {
+		cout << "high traffic cars:" << endl;
+		hightrafic(car.pelak);
+		break;
+	}
+
+	default:
+		printColored("not valid.", RED);
+		cout << endl;
+
+
+	}
+}
+
+
+void hightrafic(string pelak) {
+	//نگه داری پلاک
+	Car A[50];
+	//تعداد ورود هر پلاک
+	int counter[50];
+	// تعداد پلاک های ثبت شده
+	int count = 0;
+	Car c;
+
+	ifstream file1("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\log.txt");
+	if (!file1) {
+		cout << "can not open file1(terfic)" << endl;
+		exit(-1);
+	}
+	string line;
+	string cost;
+	while (getline(file1 >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost);
+		c.cost = stoi(cost);
+
+
+		if (c.pelak.empty()) {
+			continue;
+		}
+
+		bool found = false;
+		for (int i = 0; i < count; i++)
+		{
+			if (pelak == A[i].pelak)
+			{
+				found = true;
+				counter[i]++;
+				break;
+			}
+		}
+		//پلاک جدید باشه
+		if (!found) {
+			A[count].pelak = pelak;
+			//har pelak faghat 1bar dar lisr save she 
+			//چون این اولین بار است که این پلاک دیده شده، شمارنده‌ی ورودش را برابر ۱ قرار می‌دهی
+			counter[count] = 1;
+			//va savepelak tedad beshmare
+
+			count++;
+		}
+	}
+	file1.close();
+
+	printColored(" /have been in and out of the parking  more then 4 times/: ", BLUE);
+	cout << endl;
+	for (int i = 0; i < count; i++) {
+		if (count > 4)
+			printColored("car with this pelak ", LIGHTBLUE);
+		cout << c.pelak;
+		printColored("number of parking lot ", LIGHTBLUE);
+		cout << counter << endl;
+
+	}
+	printColored(" not found any a car that gets the most trafic :((((", RED);
+	cout << endl;
+
+}
+
+
+void reportingdaily(int year, int month, int day) {
+
+
+	ifstream file("log.txt");
+	if (!file) {
+		cout << "cannot open log.txt!" << endl;
+		return;
+	}
+	string line, cost;
+	int counter1 = 0;
+	int counter2 = 0;
+	Car c;
+
+	while (getline(file >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost);
+		c.cost = stoi(cost);
+
+
+
+		int year1 = stoi(c.timevorod.substr(0, 4));
+		int month1 = stoi(c.timevorod.substr(5, 2));
+		int day1 = stoi(c.timevorod.substr(8, 2));
+
+		// مقدار دهی میکنیم چون مطمعن نیستیم رشته خالیه یا نه
+		int year2 = 0, month2 = 0, day2 = 0;
+		//بررسی اینکه رشته خالی یا - نباشه
+		if (!c.timeexite.empty() && c.timeexite != "-") {
+			year2 = stoi(c.timeexite.substr(0, 4));
+			month2 = stoi(c.timeexite.substr(5, 2));
+			day2 = stoi(c.timeexite.substr(8, 2));
+
+		}
+		if (year1 == year && month1 == month && day1 == day)
+		{
+			counter1++;
+		}
+
+		if (year2 == year && month2 == month && day2 == day)
+		{
+			counter2++;
+		}
+
+	}
+
+	printColored("number of daily entry =", LIGHTBLUE);
+	cout << counter1 << endl;
+	printColored("number of daily exit = ", RED);
+	cout << counter2 << endl;
+}
+
+void reportingweekly(int year, int month, int day) {
+
+	Car c;
+	int counter1 = 0;
+	int counter2 = 0;
+	ifstream file1("C:\\Users\\BiG\\source\\repos\\proje(1)\\proje(1)\\log.txt");
+	if (!file1) {
+		cout << "can not open file1!!!" << endl;
+		exit(-1);
+
+	}
+
+	int x = (month - 1) * 30 + day;
+
+	int startday = x;
+	int endday = x + 7;
+
+	string line, cost;
+	while (getline(file1 >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost, ';');
+		c.cost = stoi(cost);
+
+		int year1 = stoi(c.timevorod.substr(0, 4));
+		int month1 = stoi(c.timevorod.substr(5, 2));
+		int day1 = stoi(c.timevorod.substr(8, 2));
+
+		//محاسبه روز های سال تایم ورود فایل
+		int d1 = (month1 - 1) * 30 + day1;
+		if (year == year1 && d1 <= endday && d1 >= startday) {
+			counter1++;
+		}
+
+
+		int year2 = 0, month2 = 0, day2 = 0;
+		if (!c.timeexite.empty() && c.timeexite != "-") {
+			year2 = stoi(c.timevorod.substr(0, 4));
+			month2 = stoi(c.timevorod.substr(5, 2));
+			day2 = stoi(c.timevorod.substr(8, 2));
+
+			int d2 = (month2 - 1) * 30 + day2;
+			if (year == year2 && d2 <= endday && d2 >= startday) {
+				counter2++;
+			}
+		}
+	}
+	printColored("number of weekly entry =", LIGHTBLUE);
+	cout << counter1 << endl;
+	printColored("number of weekly exit=", LIGHTBLUE);
+	cout << counter2 << endl;
+
+
+}
+
+void reportingmonthly(int year, int month) {
+
+	ifstream file("log.txt");
+	if (!file) {
+		cout << "cannot open log.txt!" << endl;
+		return;
+	}
+
+	string line, cost;
+	int counter1 = 0;
+	int counter2 = 0;
+	Car c;
+
+	while (getline(file >> ws, line)) {
+		stringstream ss(line);
+		getline(ss >> ws, c.pelak, ';');
+		getline(ss >> ws, c.timevorod, ';');
+		getline(ss >> ws, c.timeexite, ';');
+		getline(ss >> ws, c.status, ';');
+		getline(ss >> ws, cost, ';');
+		c.cost = stoi(cost);
+
+
+		int year1 = stoi(c.timevorod.substr(0, 4));
+		int month1 = stoi(c.timevorod.substr(5, 2));
+		int day1 = stoi(c.timevorod.substr(8, 2));
+
+
+		int year2 = 0, month2 = 0, day2 = 0;
+		if (!c.timeexite.empty() && c.timeexite != "-") {
+			year2 = stoi(c.timeexite.substr(0, 4));
+			month2 = stoi(c.timeexite.substr(5, 2));
+			day2 = stoi(c.timeexite.substr(8, 2));
+		}
+
+
+
+		if (year2 == year && month2 == month)
+		{
+			counter2++;
+		}
+
+	}
+
+	printColored("number of monthly entry", LIGHTBLUE);
+	cout << year;
+	printColored("-", LIGHTBLUE);
+	cout << month;
+	printColored(" = ", LIGHTBLUE);
+	cout << counter1 << endl;
+	printColored ("number of monthly exit", LIGHTBLUE);
+	cout << year;
+	printColored("-", LIGHTBLUE);
+	cout << month;
+	printColored(" = ", LIGHTBLUE);
+	cout << counter2 << endl;
+}
+
+
+
+
+
+
