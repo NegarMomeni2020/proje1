@@ -747,17 +747,7 @@ void listcar(Car A[], int& count) {
 			cout << endl;
 
 		}
-		else if (A[i].status == "outside") {
-			counterlistexite++;
-			printColored("car with this pelak ", LIGHTBLUE);
-			cout << A[i].pelak;
-			printColored(" in timeexite ", LIGHTBLUE);
-			cout << A[i].timeexite;
-			printColored(" exited the parking ", LIGHTBLUE);
-			cout << counterlistexite;
-			printColored(" time ,with cost", LIGHTBLUE);
-			cout << A[i].cost << endl;
-		}
+		
 	}
 
 }
