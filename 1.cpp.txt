@@ -447,8 +447,7 @@ void entry(Car A[], int& count, string pelak1) {
 }
 
 bool serchforexit(Car A[], string pelak1, Car& car) {
-	/*if (!checkpelak(car.pelak))
-		return false;*/
+
 	Car c;
 	bool found = false;
 	string updatestatus;
@@ -681,25 +680,19 @@ void serchcar(string pelak1, Car A[], int& count) {
 	int counter = 0;
 	for (int i = 0; i < count; i++)
 	{
-		if (A[i].pelak == pelak1 && A[i].status == "inside")
+           if (A[i].pelak == pelak1 && A[i].status == "outside")
 		{
-			found = true;
-			printColored("car with this pelak ", LIGHTBLUE);
-			cout << A[i].pelak;
-			printColored(" and with this timevorod ", LIGHTBLUE);
-			cout << A[i].timevorod;
-			printColored(" founded.", LIGHTBLUE);
-			cout << endl;
-			break;
-		}
-		else if (A[i].pelak == pelak1 && A[i].status == "outside")
-		{
+                        found = true;
 			counter++;
 			printColored("the car has left the parking", LIGHTBLUE);
 			cout << counter;
-			printColored("bar", LIGHTBLUE);
+			printColored("bar,with this timevorod", LIGHTBLUE);
+                        cout << A[i].timevorod;
+			printColored("and with this timeexite, LIGHTBLUE);
+		        cout << A[i].timevorod;
 			cout << endl;
 		}
+		
 	}
 
 	if (!found) {
